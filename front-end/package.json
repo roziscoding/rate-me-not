@@ -7,14 +7,29 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@apollo/client": "^3.3.7",
+    "@roziscoding/format": "^2.0.1",
+    "@vue/apollo-composable": "^4.0.0-alpha.12",
+    "graphql": "^15.5.0",
+    "graphql-tag": "^2.11.0",
     "vue": "^3.0.0",
-    "vue-router": "^3.5.1"
+    "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
     "@vue/cli-plugin-router": "~4.5.11",
     "@vue/cli-plugin-typescript": "~4.5.11",
     "@vue/cli-service": "~4.5.11",
     "@vue/compiler-sfc": "^3.0.5",
+    "eslint": "^7.19.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-vue": "^7.5.0",
+    "prettier": "^1.19.1",
     "typescript": "~4.1.3"
   }
 }
