@@ -3,17 +3,14 @@ module.exports = {
     es2021: true,
     node: true
   },
-  extends: [
-    'standard'
-  ],
+  extends: ['standard', 'prettier'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 12,
     sourceType: 'module'
   },
-  plugins: [
-    '@typescript-eslint'
-  ],
+  plugins: ['@typescript-eslint'],
   rules: {
+    'no-unused-vars': 'off'
   }
 }

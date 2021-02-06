@@ -1,5 +1,4 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { ItemDbObject } from './generated';
 export type Maybe<T> = T | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -7,7 +6,7 @@ export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Mayb
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
+  ID: ObjectID;
   String: string;
   Boolean: boolean;
   Int: number;
@@ -24,13 +23,16 @@ export type Scalars = {
 
 
 
+
 /**
  * A comment and a rating
  * left by an user
  */
 export type Comment = {
   __typename?: 'Comment';
+  _id: Scalars['ID'];
   createdAt: Scalars['Date'];
+  createdBy: Scalars['String'];
   text: Scalars['String'];
   rating: Scalars['Float'];
 };
@@ -52,6 +54,8 @@ export type Item = {
   /** List of all ratings received up until now */
   ratings: Array<Comment>;
   ratingsCount: Scalars['Int'];
+  createdAt: Scalars['Date'];
+  createdBy: Scalars['ID'];
 };
 
 export type CreateItemInput = {
@@ -62,6 +66,8 @@ export type CreateItemInput = {
 export type Query = {
   __typename?: 'Query';
   getItems: Array<Item>;
+  login: Scalars['String'];
+  renew: Scalars['String'];
 };
 
 
@@ -69,10 +75,22 @@ export type QueryGetItemsArgs = {
   id?: Maybe<Scalars['String']>;
 };
 
+
+export type QueryLoginArgs = {
+  username: Scalars['String'];
+  password: Scalars['String'];
+};
+
+
+export type QueryRenewArgs = {
+  token: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addItem: Item;
   rateItem: Item;
+  signup: Scalars['Boolean'];
 };
 
 
@@ -84,6 +102,25 @@ export type MutationAddItemArgs = {
 export type MutationRateItemArgs = {
   id: Scalars['String'];
   rating: CommentInput;
+};
+
+
+export type MutationSignupArgs = {
+  userData: CreateUserInput;
+};
+
+export type User = {
+  __typename?: 'User';
+  id: Scalars['ID'];
+  email: Scalars['String'];
+  username: Scalars['String'];
+  password: Scalars['String'];
+};
+
+export type CreateUserInput = {
+  email: Scalars['String'];
+  username: Scalars['String'];
+  password: Scalars['String'];
 };
 
 export type AdditionalEntityFields = {
@@ -171,35 +208,43 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   Date: ResolverTypeWrapper<Scalars['Date']>;
   Comment: ResolverTypeWrapper<Comment>;
+  ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
   CommentInput: CommentInput;
   Item: ResolverTypeWrapper<ItemDbObject>;
-  ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   CreateItemInput: CreateItemInput;
   Query: ResolverTypeWrapper<{}>;
   Mutation: ResolverTypeWrapper<{}>;
-  AdditionalEntityFields: AdditionalEntityFields;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  User: ResolverTypeWrapper<UserDbObject>;
+  CreateUserInput: CreateUserInput;
+  AdditionalEntityFields: AdditionalEntityFields;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Date: Scalars['Date'];
   Comment: Comment;
+  ID: Scalars['ID'];
   String: Scalars['String'];
   Float: Scalars['Float'];
   CommentInput: CommentInput;
   Item: ItemDbObject;
-  ID: Scalars['ID'];
   Int: Scalars['Int'];
   CreateItemInput: CreateItemInput;
   Query: {};
   Mutation: {};
-  AdditionalEntityFields: AdditionalEntityFields;
   Boolean: Scalars['Boolean'];
+  User: UserDbObject;
+  CreateUserInput: CreateUserInput;
+  AdditionalEntityFields: AdditionalEntityFields;
 };
+
+export type AuthDirectiveArgs = {   required?: Maybe<Scalars['Boolean']>; };
+
+export type AuthDirectiveResolver<Result, Parent, ContextType = any, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type UnionDirectiveArgs = {   discriminatorField?: Maybe<Scalars['String']>;
   additionalFields?: Maybe<Array<Maybe<AdditionalEntityFields>>>; };
@@ -241,7 +286,9 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 }
 
 export type CommentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = {
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  createdBy?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   rating?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -254,16 +301,29 @@ export type ItemResolvers<ContextType = any, ParentType extends ResolversParentT
   rating?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   ratings?: Resolver<Array<ResolversTypes['Comment']>, ParentType, ContextType>;
   ratingsCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  createdBy?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getItems?: Resolver<Array<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryGetItemsArgs, never>>;
+  login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'username' | 'password'>>;
+  renew?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryRenewArgs, 'token'>>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationAddItemArgs, 'itemData'>>;
   rateItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationRateItemArgs, 'id' | 'rating'>>;
+  signup?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'userData'>>;
+};
+
+export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  password?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
@@ -272,6 +332,7 @@ export type Resolvers<ContextType = any> = {
   Item?: ItemResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  User?: UserResolvers<ContextType>;
 };
 
 
@@ -281,6 +342,7 @@ export type Resolvers<ContextType = any> = {
  */
 export type IResolvers<ContextType = any> = Resolvers<ContextType>;
 export type DirectiveResolvers<ContextType = any> = {
+  auth?: AuthDirectiveResolver<any, any, ContextType>;
   union?: UnionDirectiveResolver<any, any, ContextType>;
   abstractEntity?: AbstractEntityDirectiveResolver<any, any, ContextType>;
   entity?: EntityDirectiveResolver<any, any, ContextType>;
@@ -303,4 +365,13 @@ export type ItemDbObject = {
   title: string,
   description: string,
   ratings: Array<Comment>,
+  createdAt: Date,
+  createdBy: ObjectID,
+};
+
+export type UserDbObject = {
+  _id: ObjectID,
+  email: string,
+  username: string,
+  password: string,
 };

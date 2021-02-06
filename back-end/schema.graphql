@@ -1,0 +1,65 @@
+directive @auth(required: Boolean = false) on FIELD_DEFINITION
+
+scalar Date
+
+# A comment and a rating
+# left by an user
+type Comment {
+  _id: ID!
+  createdAt: Date!
+  createdBy: String!
+  text: String!
+  rating: Float!
+}
+
+input CommentInput {
+  text: String!
+  rating: Float!
+}
+
+# An Item
+type Item {
+  # HEX representation of the ObjectId
+  id: ID!
+  title: String!
+  description: String!
+
+  # Latest average of all ratings
+  rating: Float!
+
+  # List of all ratings received up until now
+  ratings: [Comment!]!
+  ratingsCount: Int!
+  createdAt: Date!
+  createdBy: ID!
+}
+
+input CreateItemInput {
+  title: String!
+  description: String!
+}
+
+type Query {
+  getItems(id: String): [Item!]!
+  login(username: String!, password: String!): String!
+  renew(token: String!): String!
+}
+
+type Mutation {
+  addItem(itemData: CreateItemInput!): Item!
+  rateItem(id: String!, rating: CommentInput!): Item!
+  signup(userData: CreateUserInput!): Boolean!
+}
+
+type User {
+  id: ID!
+  email: String!
+  username: String!
+  password: String!
+}
+
+input CreateUserInput {
+  email: String!
+  username: String!
+  password: String!
+}

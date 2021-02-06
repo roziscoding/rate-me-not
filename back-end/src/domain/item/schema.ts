@@ -8,7 +8,9 @@ export const typeDefs = gql`
   left by an user
   """
   type Comment {
+    _id: ID!
     createdAt: Date!
+    createdBy: String!
     text: String!
     rating: Float!
   }
@@ -37,6 +39,8 @@ export const typeDefs = gql`
     """
     ratings: [Comment!]! @column
     ratingsCount: Int!
+    createdAt: Date! @column
+    createdBy: ID! @column
   }
 
   input CreateItemInput {
@@ -49,8 +53,8 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    addItem(itemData: CreateItemInput!): Item!
-    rateItem(id: String!, rating: CommentInput!): Item!
+    addItem(itemData: CreateItemInput!): Item! @auth(required: true)
+    rateItem(id: String!, rating: CommentInput!): Item! @auth(required: true)
   }
 
   schema {

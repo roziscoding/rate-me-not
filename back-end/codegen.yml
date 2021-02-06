@@ -1,7 +1,14 @@
 overwrite: true
-schema: 'src/**/*/schema.ts'
+schema:
+  - 'src/**/*/schema.ts'
+  - 'src/directives/*.ts'
 documents: null
 generates:
+  schema.graphql:
+    plugins:
+      - schema-ast:
+          includeDirectives: false
+          commentDescriptions: true
   src/generated/graphql.ts:
     plugins:
       - 'typescript'
@@ -11,6 +18,8 @@ generates:
       declarationKind: type
       maybeValue: T | undefined
       mappers:
-        Item: ./generated#ItemDbObject
+        Item: ItemDbObject
+        User: UserDbObject
       scalars:
         Date: Date
+        ID: ObjectID

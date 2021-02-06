@@ -1,4 +1,5 @@
 import { Resolvers } from '../../generated/graphql'
+import { Context } from '../../types/Contex'
 import { DeepPartial } from '../../types/DeepPartial'
 import { ItemService } from './service'
 
@@ -7,7 +8,7 @@ const getAverage = (items: number[]) =>
 
 export const factory = (service: ItemService): DeepPartial<Resolvers> => ({
   Item: {
-    id: (parent) => parent._id.toHexString(),
+    id: (parent) => parent._id,
     rating: (parent) => getAverage(parent.ratings.map(({ rating }: { rating: number }) => rating)),
     ratingsCount: (parent) => parent.ratings.length
   },
@@ -15,7 +16,9 @@ export const factory = (service: ItemService): DeepPartial<Resolvers> => ({
     getItems: (_, { id }) => service.find(id)
   },
   Mutation: {
-    addItem: (_, { itemData: { title, description } }) => service.create(title, description),
-    rateItem: (_, { id, rating }) => service.rate(id, rating)
+    addItem: (_, { itemData: { title, description } }, ctx: Context) => {
+      return service.create(title, description, ctx.user)
+    },
+    rateItem: (_, { id, rating }, ctx: Context) => service.rate(id, rating, ctx.user)
   }
 })

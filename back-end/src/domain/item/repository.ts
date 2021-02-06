@@ -11,9 +11,19 @@ export const getAll = (collection: Collection<ItemDbObject>) => async () =>
 export const create = (collection: Collection<ItemDbObject>) => async (
   id: ObjectId,
   title: string,
-  description: string
+  description: string,
+  createdBy: string
 ) =>
-  collection.insertOne({ _id: id, title, description, ratings: [] }).then((result) => result.ops[0])
+  collection
+    .insertOne({
+      _id: id,
+      title,
+      description,
+      ratings: [],
+      createdBy: new ObjectId(createdBy),
+      createdAt: new Date()
+    })
+    .then((result) => result.ops[0])
 
 export const addRating = (collection: Collection<ItemDbObject>) => async (
   id: string | ObjectId,
